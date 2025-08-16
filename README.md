@@ -35,4 +35,4 @@ Guidance and assistance were provided by **Gemini**, a large language model from
 
 ## License
 
-This project is licensed under the Apache License 2.0. Please see the `LICENSE` file for full details.
+This project is licensed under the GNU General Public License v3.0. Please see the `LICENSE` file for full details.
