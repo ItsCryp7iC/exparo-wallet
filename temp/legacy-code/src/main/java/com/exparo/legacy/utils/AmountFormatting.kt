@@ -11,6 +11,59 @@ const val MILLION = 1000000
 const val N_100K = 100000
 const val THOUSAND = 1000
 
+// Bengali numeral mapping
+private val bengaliNumerals = mapOf(
+    '0' to '০',
+    '1' to '১',
+    '2' to '২',
+    '3' to '৩',
+    '4' to '৪',
+    '5' to '৫',
+    '6' to '৬',
+    '7' to '৭',
+    '8' to '৮',
+    '9' to '৯'
+)
+
+private val englishNumerals = mapOf(
+    '০' to '0',
+    '১' to '1',
+    '২' to '2',
+    '৩' to '3',
+    '৪' to '4',
+    '৫' to '5',
+    '৬' to '6',
+    '৭' to '7',
+    '৮' to '8',
+    '৯' to '9'
+)
+
+/**
+ * Convert English numerals to Bengali numerals for display
+ */
+fun String.toBengaliNumerals(): String {
+    return this.map { char ->
+        bengaliNumerals[char] ?: char
+    }.joinToString("")
+}
+
+/**
+ * Convert Bengali numerals to English numerals for processing
+ */
+fun String.toEnglishNumerals(): String {
+    return this.map { char ->
+        englishNumerals[char] ?: char
+    }.joinToString("")
+}
+
+/**
+ * Check if the current locale is Bengali
+ */
+fun isBengaliLocale(): Boolean {
+    val locale = java.util.Locale.getDefault()
+    return locale.language == "bn" || locale.toString() == "bn_BD"
+}
+
 fun String.amountToDoubleOrNull(): Double? {
     return this.normalizeAmount().toDoubleOrNull()
 }
@@ -30,19 +83,27 @@ fun String.normalizeExpression(): String {
 }
 
 fun String.removeGroupingSeparator(): String {
-    return replace(localGroupingSeparator(), "")
+    // Always use English numerals for processing
+    val separator = DecimalFormatSymbols.getInstance().groupingSeparator.toString()
+    return this.toEnglishNumerals().replace(separator, "")
 }
 
 fun String.normalizeDecimalSeparator(): String {
-    return replace(localDecimalSeparator(), ".")
+    // Always use English numerals for processing
+    val separator = DecimalFormatSymbols.getInstance().decimalSeparator.toString()
+    return this.toEnglishNumerals().replace(separator, ".")
 }
 
 fun localDecimalSeparator(): String {
-    return DecimalFormatSymbols.getInstance().decimalSeparator.toString()
+    val separator = DecimalFormatSymbols.getInstance().decimalSeparator.toString()
+    // For Bengali locale, display Bengali numeral but return English for processing
+    return if (isBengaliLocale()) separator.toBengaliNumerals() else separator
 }
 
 fun localGroupingSeparator(): String {
-    return DecimalFormatSymbols.getInstance().groupingSeparator.toString()
+    val separator = DecimalFormatSymbols.getInstance().groupingSeparator.toString()
+    // For Bengali locale, display Bengali numeral but return English for processing
+    return if (isBengaliLocale()) separator.toBengaliNumerals() else separator
 }
 
 // Display Formatting
@@ -93,7 +154,11 @@ fun Double.formatCrypto(): String {
     }
 }
 
-private fun Double.formatFIAT(): String = DecimalFormat("#,##0.00").format(this)
+private fun Double.formatFIAT(): String {
+    val formatted = DecimalFormat("#,##0.00").format(this)
+    // For Bengali locale, display Bengali numerals
+    return if (isBengaliLocale()) formatted.toBengaliNumerals() else formatted
+}
 
 fun shortenAmount(amount: Double): String {
     return when {
@@ -131,7 +196,9 @@ fun shouldShortAmount(amount: Double): Boolean {
 }
 
 fun formatInt(number: Int): String {
-    return DecimalFormat("#,###,###,###").format(number)
+    val formatted = DecimalFormat("#,###,###,###").format(number)
+    // For Bengali locale, display Bengali numerals
+    return if (isBengaliLocale()) formatted.toBengaliNumerals() else formatted
 }
 
 fun decimalPartFormatted(currency: String, value: Double): String {
@@ -170,10 +237,16 @@ fun formatInputAmount(
     newSymbol: String,
     decimalCountMax: Int = 2,
 ): String? {
-    val newlyEnteredNumberString = amount + newSymbol
+    // Always use English numerals for processing
+    val processedAmount = amount.toEnglishNumerals()
+    val processedNewSymbol = newSymbol.toEnglishNumerals()
+    
+    val newlyEnteredNumberString = processedAmount + processedNewSymbol
 
+    // Use English decimal separator for processing
+    val separator = DecimalFormatSymbols.getInstance().decimalSeparator.toString()
     val decimalPartString = newlyEnteredNumberString
-        .split(localDecimalSeparator())
+        .split(separator)
         .getOrNull(1)
     val decimalCount = decimalPartString?.length ?: 0
 
@@ -184,11 +257,14 @@ fun formatInputAmount(
     if (amountDouble != null && decimalCountOkay) {
         val intPart = truncate(amountDouble).toInt()
         val decimalPartFormatted = if (decimalPartString != null) {
-            "${localDecimalSeparator()}$decimalPartString"
+            // Display Bengali numerals for the decimal separator if in Bengali locale
+            val displaySeparator = if (isBengaliLocale()) separator.toBengaliNumerals() else separator
+            "$displaySeparator$decimalPartString"
         } else {
             ""
         }
 
+        // Format the integer part (will display Bengali numerals if in Bengali locale)
         return formatInt(intPart) + decimalPartFormatted
     }
 

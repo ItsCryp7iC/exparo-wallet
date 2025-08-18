@@ -78,7 +78,13 @@ fun BoxWithConstraintsScope.CalculatorModal(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
-            text = if (isEmpty) stringResource(R.string.calculator_empty_expression) else expression,
+            text = if (isEmpty) stringResource(R.string.calculator_empty_expression) else {
+                if (com.exparo.legacy.utils.isBengaliLocale()) {
+                    com.exparo.legacy.utils.toBengaliNumerals(expression)
+                } else {
+                    expression
+                }
+            },
             style = UI.typo.nH2.style(
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

@@ -32,6 +32,7 @@ import com.exparo.design.l0_system.UI
 import com.exparo.legacy.ExparoWalletComponentPreview
 import com.exparo.legacy.data.model.Month
 import com.exparo.legacy.utils.lerp
+import com.exparo.legacy.utils.toBengaliNumerals
 import com.exparo.wallet.ui.theme.Gray
 import com.exparo.wallet.ui.theme.Green
 import com.exparo.wallet.ui.theme.Exparo
@@ -311,11 +312,6 @@ fun ExparoLineChart(
     }
 
     ExparoChart(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height)
-            .clip(UI.shapes.r2)
-            .border(2.dp, Gray, UI.shapes.r2),
         title = title,
         allValues = allValues,
         xLabel = xLabel,
@@ -324,6 +320,11 @@ fun ExparoLineChart(
         minY = minY,
         functions = functions,
         tapEvent = tapEvent,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .clip(UI.shapes.r2)
+            .border(2.dp, Gray, UI.shapes.r2),
         onTap = onTapInternal
     )
 }
@@ -331,7 +332,6 @@ fun ExparoLineChart(
 @Deprecated("Old design system. Use `:exparo-design` and Material3")
 @Composable
 private fun ExparoChart(
-    modifier: Modifier,
     title: String,
     allValues: List<Value>,
     xLabel: (x: Double) -> String,
@@ -340,6 +340,7 @@ private fun ExparoChart(
     minY: Double,
     functions: List<Function>,
     tapEvent: TapEvent?,
+    modifier: Modifier = Modifier,
     onTap: (TapEvent) -> Unit
 ) {
     var points: List<FunctionPoint> by remember {
@@ -688,7 +689,12 @@ private fun Preview_ExparoChart() {
                 Month.monthsList()[it.toInt()].name.first().toString()
             },
             yLabel = {
-                DecimalFormat("#,###").format(it)
+                val formatted = DecimalFormat("#,###").format(it)
+                if (com.exparo.legacy.utils.isBengaliLocale()) {
+                    formatted.toBengaliNumerals()
+                } else {
+                    formatted
+                }
             }
         )
     }

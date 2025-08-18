@@ -48,8 +48,11 @@ import com.exparo.legacy.utils.format
 import com.exparo.legacy.utils.formatInputAmount
 import com.exparo.legacy.utils.formatInt
 import com.exparo.legacy.utils.hideKeyboard
+import com.exparo.legacy.utils.isBengaliLocale
 import com.exparo.legacy.utils.localDecimalSeparator
 import com.exparo.legacy.utils.onScreenStart
+import com.exparo.legacy.utils.toBengaliNumerals
+import com.exparo.legacy.utils.toEnglishNumerals
 import com.exparo.ui.R
 import com.exparo.wallet.ui.theme.Red
 import com.exparo.wallet.ui.theme.components.ExparoIcon
@@ -117,7 +120,7 @@ fun BoxWithConstraintsScope.AmountModal(
                 iconStart = R.drawable.ic_check
             ) {
                 try {
-                    onAmountChanged(amount.amountToDouble())
+                    onAmountChanged(amount.toEnglishNumerals().amountToDouble())
                     dismiss()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -178,7 +181,7 @@ fun BoxWithConstraintsScope.AmountModal(
 
     CalculatorModal(
         visible = calculatorModalVisible,
-        initialAmount = amount.amountToDoubleOrNull(),
+        initialAmount = amount.toEnglishNumerals().amountToDoubleOrNull(),
         currency = currency,
         dismiss = {
             calculatorModalVisible = false
@@ -202,7 +205,7 @@ fun AmountCurrency(
         Spacer(Modifier.weight(1f))
 
         Text(
-            text = amount.ifBlank { "0" },
+            text = amount.ifBlank { "0" }.toBengaliNumerals(),
             style = UI.typo.nH2.style(
                 fontWeight = FontWeight.Bold,
                 color = UI.colors.pureInverse
@@ -233,15 +236,15 @@ fun AmountInput(
     AmountKeyboard(
         horizontalPadding = 40.dp,
         forCalculator = false,
-        onNumberPressed = {
+        onNumberPressed = { newSymbol ->
             if (firstInput) {
-                setAmount(it)
+                setAmount(newSymbol)
                 firstInput = false
             } else {
                 val formattedAmount = formatInputAmount(
                     currency = currency,
-                    amount = amount,
-                    newSymbol = it,
+                    amount = amount.toEnglishNumerals(),
+                    newSymbol = newSymbol,
                     decimalCountMax = decimalCountMax
                 )
                 if (formattedAmount != null) {
@@ -254,10 +257,11 @@ fun AmountInput(
                 setAmount("0${localDecimalSeparator()}")
                 firstInput = false
             } else {
-                val newlyEnteredString = if (amount.isEmpty()) {
+                val englishAmount = amount.toEnglishNumerals()
+                val newlyEnteredString = if (englishAmount.isEmpty()) {
                     "0${localDecimalSeparator()}"
                 } else {
-                    "$amount${localDecimalSeparator()}"
+                    "$englishAmount${localDecimalSeparator()}"
                 }
                 if (newlyEnteredString.amountToDoubleOrNull() != null) {
                     setAmount(newlyEnteredString)
@@ -279,12 +283,14 @@ fun AmountInput(
 }
 
 private fun formatNumber(number: String): String? {
-    val decimalPartString = number
+    val englishNumber = number.toEnglishNumerals()
+
+    val decimalPartString = englishNumber
         .split(localDecimalSeparator())
         .getOrNull(1)
     val newDecimalCount = decimalPartString?.length ?: 0
 
-    val amountDouble = number.amountToDoubleOrNull()
+    val amountDouble = englishNumber.amountToDoubleOrNull()
 
     if (newDecimalCount <= 2 && amountDouble != null) {
         val intPart = truncate(amountDouble).toInt()
@@ -293,11 +299,10 @@ private fun formatNumber(number: String): String? {
         } else {
             ""
         }
-
         return formatInt(intPart) + decimalFormatted
     }
 
-    return null
+    return if (number.isEmpty()) "" else null
 }
 
 @SuppressLint(
@@ -319,14 +324,6 @@ fun AmountKeyboard(
     FourthRowExtra: (@Composable RowScope.() -> Unit)? = null,
     onBackspace: () -> Unit,
 ) {
-    /**
-     * Retrieve `features` via EntryPointAccessors. `isStandardLayout` is stable and
-     * only changes via settings, so there isn't unnecessary recompositions.
-     * `isStandardLayout` doesn't change while the keyboard is shown.
-     * `AmountKeyboard` is self-contained, making it easy to reuse without passing parameters.
-     * Layout changes are rare, so recomposition has minimal impact on performance.
-     **/
-
     val context = LocalContext.current
     val features = remember {
         EntryPointAccessors.fromApplication(
@@ -336,14 +333,13 @@ fun AmountKeyboard(
     }
     val isStandardLayout = features.standardKeypadLayout.asEnabledState()
 
-    // Decide the order of the numbers based on the keypad layout
     val countButtonValues = if (isStandardLayout) {
         listOf(
             listOf("1", "2", "3"),
             listOf("4", "5", "6"),
             listOf("7", "8", "9"),
         )
-    } else { // Calculator like numeric keypad layout
+    } else {
         listOf(
             listOf("7", "8", "9"),
             listOf("4", "5", "6"),
@@ -365,7 +361,6 @@ fun AmountKeyboard(
         Spacer(Modifier.height(8.dp))
     }
 
-    // Loop through the rows to create CircleNumberButtons
     countButtonValues.forEachIndexed { rowIndex, rowNumbers ->
         Row(
             modifier = Modifier
@@ -400,7 +395,7 @@ fun AmountKeyboard(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         KeypadCircleButton(
-            text = localDecimalSeparator(),
+            text = localDecimalSeparator().toBengaliNumerals(),
             testTag = if (forCalculator) {
                 "calc_key_decimal_separator"
             } else {
@@ -436,7 +431,7 @@ fun CircleNumberButton(
     onNumberPressed: (String) -> Unit,
 ) {
     KeypadCircleButton(
-        text = value,
+        text = value.toBengaliNumerals(),
         testTag = if (forCalculator) {
             "calc_key_$value"
         } else {
