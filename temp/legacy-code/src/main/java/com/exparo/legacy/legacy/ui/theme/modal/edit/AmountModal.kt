@@ -205,7 +205,8 @@ fun AmountCurrency(
         Spacer(Modifier.weight(1f))
 
         Text(
-            text = amount.ifBlank { "0" }.toBengaliNumerals(),
+            // ## FIX 1: Conditionally convert the displayed amount ##
+            text = if (isBengaliLocale()) amount.ifBlank { "0" }.toBengaliNumerals() else amount.ifBlank { "0" },
             style = UI.typo.nH2.style(
                 fontWeight = FontWeight.Bold,
                 color = UI.colors.pureInverse
@@ -394,8 +395,10 @@ fun AmountKeyboard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+        val decimalSeparator = localDecimalSeparator()
         KeypadCircleButton(
-            text = localDecimalSeparator().toBengaliNumerals(),
+            // ## FIX 2: Conditionally convert the decimal separator key ##
+            text = if (isBengaliLocale()) decimalSeparator.toBengaliNumerals() else decimalSeparator,
             testTag = if (forCalculator) {
                 "calc_key_decimal_separator"
             } else {
@@ -431,7 +434,8 @@ fun CircleNumberButton(
     onNumberPressed: (String) -> Unit,
 ) {
     KeypadCircleButton(
-        text = value.toBengaliNumerals(),
+        // ## FIX 3: Conditionally convert the number keys ##
+        text = if (isBengaliLocale()) value.toBengaliNumerals() else value,
         testTag = if (forCalculator) {
             "calc_key_$value"
         } else {
