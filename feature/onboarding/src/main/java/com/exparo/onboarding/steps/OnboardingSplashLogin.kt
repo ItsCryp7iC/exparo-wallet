@@ -269,6 +269,14 @@ private fun LoginSection(
             Spacer(Modifier.height(16.dp))
             Spacer(Modifier.weight(1f))
 
+            GoogleAccountExplanation()
+
+            Spacer(Modifier.height(16.dp))
+
+            GoogleLoginButton()
+
+            Spacer(Modifier.height(24.dp))
+
             LocalAccountExplanation()
 
             Spacer(Modifier.height(16.dp))
@@ -309,6 +317,44 @@ private fun LocalAccountExplanation(modifier: Modifier = Modifier) { // 1. Add m
             text = stringResource(R.string.your_data_will_be_saved_only_locally),
             //...
         )
+    }
+}
+
+@Composable
+private fun GoogleAccountExplanation(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            modifier = Modifier.padding(start = 32.dp),
+            text = "CONNECT GOOGLE ACCOUNT",
+            style = UI.typo.b1.style(
+                color = UI.colors.pureInverse,
+                fontWeight = FontWeight.Black
+            )
+        )
+
+        Spacer(Modifier.height(4.dp))
+
+        Text(
+            modifier = Modifier.padding(start = 32.dp, end = 32.dp),
+            text = "Connect your Google account to keep data backed up to Drive and automatically restore on reinstall. You can also enable scheduled auto backups.",
+            style = UI.typo.nB2.style(
+                color = UI.colors.pureInverse.copy(alpha = 0.7f)
+            )
+        )
+    }
+}
+
+@Composable
+private fun GoogleLoginButton() {
+    val nav = com.exparo.navigation.navigation()
+    LoginButton(
+        icon = R.drawable.ic_vue_security_shield,
+        text = "Sign in with Google",
+        textColor = UI.colors.pure,
+        backgroundGradient = Gradient.solid(Green),
+        hasShadow = true
+    ) {
+                        nav.navigateTo(com.exparo.navigation.DriveBackupScreen(isFromOnboarding = true))
     }
 }
 

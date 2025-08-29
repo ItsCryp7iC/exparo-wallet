@@ -5,6 +5,7 @@ plugins {
     // ./gradlew detektFormat // To check with enabled auto-correction
     id("exparo.detekt")
     id("com.jraska.module.graph.assertion")
+    id("com.google.gms.google-services") apply false
 
     alias(libs.plugins.gradleWrapperUpgrade)
 

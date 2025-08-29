@@ -239,6 +239,7 @@
     <string name="export">Export</string>
     <string name="no_transactions_for_query">There are no transactions for the "%1$s" query.</string>
     <string name="import_export"><![CDATA[Import & Export]]></string>
+<string name="backup_to_google_drive">Backup to Google Drive</string>
     <string name="backup_data">Backup data</string>
     <string name="import_data">Import data</string>
     <string name="app_settings">App Settings</string>

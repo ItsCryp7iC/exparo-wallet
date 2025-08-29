@@ -146,6 +146,7 @@ class OnboardingViewModel @Inject constructor(
                 is OnboardingEvent.ImportFinished -> importFinished(event.success)
                 OnboardingEvent.ImportSkip -> importSkip()
                 OnboardingEvent.LoginOfflineAccount -> loginOfflineAccount()
+                OnboardingEvent.GoogleSignInComplete -> googleSignInComplete()
                 OnboardingEvent.OnAddAccountsDone -> onAddAccountsDone()
                 OnboardingEvent.OnAddAccountsSkip -> onAddAccountsSkip()
                 OnboardingEvent.OnAddCategoriesDone -> onAddCategoriesDone()
@@ -159,6 +160,10 @@ class OnboardingViewModel @Inject constructor(
 
     private suspend fun loginOfflineAccount() {
         router.offlineAccountNext()
+    }
+
+    private suspend fun googleSignInComplete() {
+        router.googleSignInComplete()
     }
     // Step 1 ---------------------------------------------------------------------------------------
 

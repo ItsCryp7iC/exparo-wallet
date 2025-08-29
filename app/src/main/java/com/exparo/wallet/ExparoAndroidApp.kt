@@ -1,9 +1,9 @@
 package com.exparo.wallet
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.exparo.base.legacy.appContext
+import com.exparo.drivebackup.worker.ScheduledBackupWorkerFactory
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import timber.log.Timber.DebugTree
@@ -15,11 +15,11 @@ import javax.inject.Inject
 @HiltAndroidApp
 class ExparoAndroidApp : Application(), Configuration.Provider {
     @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+    lateinit var scheduledBackupWorkerFactory: ScheduledBackupWorkerFactory
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
+            .setWorkerFactory(scheduledBackupWorkerFactory)
             .build()
 
     override fun onCreate() {

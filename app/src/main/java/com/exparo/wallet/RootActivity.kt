@@ -25,7 +25,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -38,6 +42,7 @@ import com.exparo.design.api.ExparoDesign
 import com.exparo.design.api.ExparoUI
 import com.exparo.design.system.ExparoMaterial3Theme
 import com.exparo.domain.RootScreen
+import com.exparo.drivebackup.service.GoogleDriveService
 import com.exparo.home.customerjourney.CustomerJourneyCardsProvider
 import com.exparo.legacy.Constants
 import com.exparo.legacy.ExparoWalletCtx
@@ -58,6 +63,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 @Suppress("TooManyFunctions")
@@ -83,11 +89,17 @@ class RootActivity : AppCompatActivity(), RootScreen {
     @Inject
     lateinit var dateTimePicker: DateTimePicker
 
+    @Inject
+    lateinit var googleDriveService: GoogleDriveService
+
     private lateinit var createFileLauncher: ActivityResultLauncher<String>
     private lateinit var onFileCreated: (fileUri: Uri) -> Unit
 
     private lateinit var openFileLauncher: ActivityResultLauncher<Unit>
     private lateinit var onFileOpened: (fileUri: Uri) -> Unit
+
+    private lateinit var googleSignInLauncher: ActivityResultLauncher<Unit>
+    private var onGoogleSignInResult: ((Boolean) -> Unit)? = null
 
     private val viewModel: RootViewModel by viewModels()
 
@@ -242,8 +254,42 @@ class RootActivity : AppCompatActivity(), RootScreen {
 
     private fun setupActivityForResultLaunchers() {
         createFileLauncher()
-
         openFileLauncher()
+        setupGoogleSignInLauncher()
+    }
+
+    private fun setupGoogleSignInLauncher() {
+        googleSignInLauncher = simpleActivityForResultLauncher(
+            intent = googleDriveService.getSignInIntent()
+        ) { _, intent ->
+            try {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
+                val account = task.getResult(ApiException::class.java)
+                handleGoogleSignInSuccess(account)
+            } catch (e: ApiException) {
+                handleGoogleSignInFailure(e)
+            }
+        }
+    }
+
+    private fun handleGoogleSignInSuccess(account: GoogleSignInAccount) {
+        // Initialize the Drive service with the signed-in account
+        lifecycleScope.launch {
+            val success = googleDriveService.handleSignInResult(account)
+            onGoogleSignInResult?.invoke(success)
+            onGoogleSignInResult = null
+        }
+    }
+
+    private fun handleGoogleSignInFailure(exception: ApiException) {
+        Toast.makeText(this, "Google Sign-In failed: ${exception.statusCode}", Toast.LENGTH_SHORT).show()
+        onGoogleSignInResult?.invoke(false)
+        onGoogleSignInResult = null
+    }
+
+    fun launchGoogleSignIn(onResult: (Boolean) -> Unit) {
+        onGoogleSignInResult = onResult
+        googleSignInLauncher.launch(Unit)
     }
 
     private fun createFileLauncher() {

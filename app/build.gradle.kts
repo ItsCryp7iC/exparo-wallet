@@ -27,6 +27,16 @@ android {
         generateLocaleConfig = true
     }
 
+    packaging {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/LICENSE.txt"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.txt"
+        }
+    }
+
     signingConfigs {
         // This block for debug was correctly commented out.
         // getByName("debug") {
@@ -61,6 +71,9 @@ android {
             signingConfig = signingConfigs.getByName("release")
 
             resValue("string", "app_name", "Exparo Wallet")
+            
+            // Use release Firebase configuration
+            manifestPlaceholders["googleServicesFile"] = "google-services-release.json"
         }
 
         debug {
@@ -76,6 +89,9 @@ android {
 
             applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Exparo Debug")
+            
+            // Use debug Firebase configuration
+            manifestPlaceholders["googleServicesFile"] = "google-services-debug.json"
         }
 
         create("demo") {
@@ -157,6 +173,7 @@ dependencies {
     implementation(projects.feature.settings)
     implementation(projects.feature.transactions)
     implementation(projects.feature.poll.impl)
+    implementation(projects.feature.driveBackup)
     implementation(projects.shared.base)
     implementation(projects.shared.data.core)
     implementation(projects.shared.domain)
@@ -196,4 +213,17 @@ dependencies {
     testImplementation(libs.androidx.work.testing)
 
     lintChecks(libs.slack.lint.compose)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+
+    // Add the dependency for Firebase Authentication
+    implementation("com.google.firebase:firebase-auth")
+
+    // Add the dependency for Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
 }
+
+// Configure Google Services plugin to use different files for debug/release
+// The google-services.json file will be copied manually before building

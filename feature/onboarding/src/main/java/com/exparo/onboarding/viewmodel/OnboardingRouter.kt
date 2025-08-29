@@ -46,12 +46,25 @@ class OnboardingRouter(
 ) {
 
     var isLoginCache = false
+    var isFromGoogleSignIn = false
 
     fun initBackHandling(
         screen: OnboardingScreen,
         viewModelScope: CoroutineScope,
         restartOnboarding: () -> Unit
     ) {
+        // Check if we're coming from Google sign-in by checking shared preferences
+        val isFromGoogleSignInPref = sharedPrefs.getBoolean("is_from_google_signin", false)
+        if (isFromGoogleSignInPref) {
+            // Clear the flag and set state to CURRENCY
+            sharedPrefs.putBoolean("is_from_google_signin", false)
+            state.value = OnboardingState.CURRENCY
+        } else if (isFromGoogleSignIn) {
+            // Fallback to the existing flag
+            state.value = OnboardingState.CURRENCY
+            isFromGoogleSignIn = false // Reset the flag
+        }
+
         nav.onBackPressed[screen] = {
             when (state.value) {
                 OnboardingState.SPLASH -> {
@@ -108,7 +121,12 @@ class OnboardingRouter(
         if (state.value == OnboardingState.SPLASH) {
             delay(1000)
 
-            state.value = OnboardingState.LOGIN
+            if (isFromGoogleSignIn) {
+                // Skip LOGIN state and go directly to CURRENCY
+                state.value = OnboardingState.CURRENCY
+            } else {
+                state.value = OnboardingState.LOGIN
+            }
         }
     }
     // ------------------------------------- Step 0 -------------------------------------------------
@@ -131,6 +149,12 @@ class OnboardingRouter(
 
     suspend fun offlineAccountNext() {
         state.value = OnboardingState.CHOOSE_PATH
+    }
+
+    suspend fun googleSignInComplete() {
+        // Skip Import CSV step and go directly to Set Currency
+        isFromGoogleSignIn = true
+        state.value = OnboardingState.CURRENCY
     }
     // ------------------------------------- Step 1 -------------------------------------------------
 

@@ -1,5 +1,5 @@
 plugins {
-    org.jetbrains.kotlin.plugin.compose
+    kotlin("plugin.compose")
     id("exparo.module")
     id("exparo.compose")
     id("exparo.paparazzi")

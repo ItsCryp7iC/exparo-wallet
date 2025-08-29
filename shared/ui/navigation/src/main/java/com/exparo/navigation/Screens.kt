@@ -6,19 +6,19 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
 
-data object MainScreen : Screen {
+data object MainScreen : Screen("main") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object OnboardingScreen : Screen {
+data object OnboardingScreen : Screen("onboarding") {
     override val isLegacy: Boolean
         get() = true
 }
 
 data class CSVScreen(
     val launchedFromOnboarding: Boolean
-) : Screen {
+) : Screen("csv") {
     override val isLegacy: Boolean
         get() = true
 }
@@ -29,7 +29,7 @@ data class EditTransactionScreen(
     // extras
     val accountId: UUID? = null,
     val categoryId: UUID? = null
-) : Screen {
+) : Screen("edit_transaction") {
     override val isLegacy: Boolean
         get() = true
 }
@@ -41,7 +41,7 @@ data class TransactionsScreen(
     val transactionType: TransactionType? = null,
     val accountIdFilterList: List<UUID> = persistentListOf(),
     val transactions: List<Transaction> = persistentListOf()
-) : Screen {
+) : Screen("transactions") {
     override val isLegacy: Boolean
         get() = true
 }
@@ -52,7 +52,7 @@ data class PieChartStatisticScreen(
     val accountList: ImmutableList<UUID> = persistentListOf(),
     val transactions: ImmutableList<Transaction> = persistentListOf(),
     val treatTransfersAsIncomeExpense: Boolean = false
-) : Screen {
+) : Screen("pie_chart_statistic") {
     override val isLegacy: Boolean
         get() = true
 }
@@ -65,7 +65,7 @@ data class EditPlannedScreen(
     val categoryId: UUID? = null,
     val title: String? = null,
     val description: String? = null,
-) : Screen {
+) : Screen("edit_planned") {
     override val isLegacy: Boolean
         get() = true
 
@@ -75,73 +75,83 @@ data class EditPlannedScreen(
     }
 }
 
-data object BalanceScreen : Screen {
+data object BalanceScreen : Screen("balance") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object PlannedPaymentsScreen : Screen {
+data object PlannedPaymentsScreen : Screen("planned_payments") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object CategoriesScreen : Screen {
+data object CategoriesScreen : Screen("categories") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object SettingsScreen : Screen {
+data object SettingsScreen : Screen("settings") {
     override val isLegacy: Boolean
         get() = true
 }
 
 data class ImportScreen(
     val launchedFromOnboarding: Boolean
-) : Screen {
+) : Screen("import") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object ReportScreen : Screen {
+data object ReportScreen : Screen("report") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object BudgetScreen : Screen {
+data object BudgetScreen : Screen("budget") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object LoansScreen : Screen {
+data object LoansScreen : Screen("loans") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object SearchScreen : Screen {
+data object SearchScreen : Screen("search") {
     override val isLegacy: Boolean
         get() = true
 }
 
 data class LoanDetailsScreen(
     val loanId: UUID
-) : Screen {
+) : Screen("loan_details") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object ExchangeRatesScreen : Screen {
+data object ExchangeRatesScreen : Screen("exchange_rates") {
     override val isLegacy: Boolean
         get() = true
 }
 
-data object FeaturesScreen : Screen
+data object FeaturesScreen : Screen("features")
 
-data object AttributionsScreen : Screen
+data object AttributionsScreen : Screen("attributions")
 
-data object ContributorsScreen : Screen
+data object ContributorsScreen : Screen("contributors")
 
-data object ReleasesScreen : Screen
+data object ReleasesScreen : Screen("releases")
 
-data object DisclaimerScreen : Screen
+data object DisclaimerScreen : Screen("disclaimer")
 
-data object PollScreen : Screen
+data object PollScreen : Screen("poll")
+
+data class DriveBackupScreen(
+    val isFromOnboarding: Boolean = false
+) : Screen("drive_backup") {
+    override val isLegacy: Boolean
+        get() = true
+}
+
+// This is our new screen, now correctly defined
+data object ScheduledBackupSettings : Screen("scheduled_backup_settings")

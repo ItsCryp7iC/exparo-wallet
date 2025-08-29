@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "326016109899",
+    "project_id": "exparo-wallet-47d37",
+    "storage_bucket": "exparo-wallet-47d37.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326016109899:android:b7dd8032674263e145acce",
+        "android_client_info": {
+          "package_name": "com.exparo.wallet.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "326016109899-mnst3hp07u5s1sdavg12kbbeu254vgcs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.exparo.wallet.debug",
+            "certificate_hash": "4b5067f9e01172eb87edb48ea5e5cc72faf896bc"
+          }
+        },
+        {
+          "client_id": "326016109899-h44cmlf8u7c7ghru1df34rtuv556btk9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD13Qw6GkSU647DBbWEM0v5POYCKcWNkLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "326016109899-h44cmlf8u7c7ghru1df34rtuv556btk9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

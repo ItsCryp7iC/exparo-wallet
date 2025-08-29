@@ -1,6 +1,6 @@
 plugins {
     id("exparo.module")
-    org.jetbrains.kotlin.plugin.compose
+    kotlin("plugin.compose")
 }
 
 android {

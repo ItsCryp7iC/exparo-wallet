@@ -83,6 +83,7 @@ fun BoxWithConstraintsScope.SettingsScreen() {
     val uiState = viewModel.uiState()
     val rootScreen = rootScreen()
 
+    val nav = navigation()
     UI(
         currencyCode = uiState.currencyCode,
         theme = uiState.currentTheme,
@@ -106,6 +107,9 @@ fun BoxWithConstraintsScope.SettingsScreen() {
         },
         onBackupData = {
             viewModel.onEvent(SettingsEvent.BackupData(rootScreen))
+        },
+        onBackupToGoogleDrive = {
+                            nav.navigateTo(com.exparo.navigation.DriveBackupScreen(isFromOnboarding = false))
         },
         onExportToCSV = {
             viewModel.onEvent(SettingsEvent.ExportToCsv(rootScreen))
@@ -159,6 +163,7 @@ private fun BoxWithConstraintsScope.UI(
     treatTransfersAsIncomeExpense: Boolean = false,
     onSetName: (String) -> Unit = {},
     onBackupData: () -> Unit = {},
+    onBackupToGoogleDrive: () -> Unit = {},
     onExportToCSV: () -> Unit = {},
     onSetLockApp: (Boolean) -> Unit = {},
     onSetShowNotifications: (Boolean) -> Unit = {},
@@ -255,6 +260,16 @@ private fun BoxWithConstraintsScope.UI(
                 iconPadding = 8.dp
             ) {
                 onBackupData()
+            }
+
+            Spacer(Modifier.height(12.dp))
+            
+            SettingsDefaultButton(
+                icon = R.drawable.ic_vue_security_shield,
+                text = stringResource(R.string.backup_to_google_drive),
+                iconPadding = 8.dp
+            ) {
+                onBackupToGoogleDrive()
             }
 
             Spacer(Modifier.height(12.dp))

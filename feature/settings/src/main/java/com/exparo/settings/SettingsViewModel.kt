@@ -37,6 +37,8 @@ import com.exparo.wallet.domain.action.settings.SettingsAct
 import com.exparo.widget.balance.WalletBalanceWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.exparo.navigation.DriveBackupScreen
+import com.exparo.navigation.Navigation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -216,6 +218,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.SwitchTheme -> switchTheme()
             is SettingsEvent.SetLockApp -> setLockApp(event.lockApp)
             is SettingsEvent.SetShowNotifications -> setShowNotifications(event.showNotifications)
+            is SettingsEvent.BackupToGoogleDrive -> backupToGoogleDrive()
             is SettingsEvent.SetHideCurrentBalance -> setHideCurrentBalance(
                 event.hideCurrentBalance
             )
@@ -293,7 +296,14 @@ class SettingsViewModel @Inject constructor(
         ) { fileUri ->
             viewModelScope.launch(Dispatchers.IO) {
                 progressState.value = true
-                backupDataUseCase.exportToFile(zipFileUri = fileUri)
+
+                // --- FIX ---
+                // Get an OutputStream from the file URI and call the new function
+                context.contentResolver.openOutputStream(fileUri)?.use { outputStream ->
+                    backupDataUseCase.exportToStream(outputStream)
+                }
+                // --- END FIX ---
+
                 progressState.value = false
 
                 sharedPrefs.putBoolean(SharedPrefs.DATA_BACKUP_COMPLETED, true)
@@ -371,6 +381,12 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun backupToGoogleDrive() {
+        // Navigate to the Google Drive backup screen
+        val nav = Navigation()
+                    nav.navigateTo(screen = DriveBackupScreen(isFromOnboarding = false))
     }
 
     private fun deleteCloudUserData() {

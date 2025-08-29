@@ -9,6 +9,7 @@ import com.exparo.wallet.domain.deprecated.logic.model.CreateCategoryData
 sealed interface OnboardingEvent {
 
     data object LoginOfflineAccount : OnboardingEvent
+    data object GoogleSignInComplete : OnboardingEvent
     data object StartImport : OnboardingEvent
     data object ImportSkip : OnboardingEvent
     data class ImportFinished(val success: Boolean) : OnboardingEvent

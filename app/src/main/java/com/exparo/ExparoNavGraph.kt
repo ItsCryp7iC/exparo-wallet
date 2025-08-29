@@ -10,6 +10,7 @@ import com.exparo.budgets.BudgetScreen
 import com.exparo.categories.CategoriesScreen
 import com.exparo.contributors.ContributorsScreenImpl
 import com.exparo.disclaimer.DisclaimerScreenImpl
+import com.exparo.drivebackup.ui.backup.BackupScreen
 import com.exparo.exchangerates.ExchangeRatesScreen
 import com.exparo.features.FeaturesScreenImpl
 import com.exparo.importdata.csv.CSVScreen
@@ -24,6 +25,7 @@ import com.exparo.navigation.CSVScreen
 import com.exparo.navigation.CategoriesScreen
 import com.exparo.navigation.ContributorsScreen
 import com.exparo.navigation.DisclaimerScreen
+import com.exparo.navigation.DriveBackupScreen
 import com.exparo.navigation.EditPlannedScreen
 import com.exparo.navigation.EditTransactionScreen
 import com.exparo.navigation.ExchangeRatesScreen
@@ -53,6 +55,10 @@ import com.exparo.search.SearchScreen
 import com.exparo.settings.SettingsScreen
 import com.exparo.transaction.EditTransactionScreen
 import com.exparo.transactions.TransactionsScreen
+import com.exparo.drivebackup.ui.settings.ScheduledBackupSettingsScreen
+import com.exparo.navigation.ScheduledBackupSettings // The screen object itself
+
+
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -66,6 +72,7 @@ fun BoxWithConstraintsScope.ExparoNavGraph(screen: Screen?) {
 
         is MainScreen -> MainScreen(screen = screen)
         is OnboardingScreen -> OnboardingScreen(screen = screen)
+        is ScheduledBackupSettings -> ScheduledBackupSettingsScreen()
         is ExchangeRatesScreen -> ExchangeRatesScreen()
         is EditTransactionScreen -> EditTransactionScreen(screen = screen)
         is TransactionsScreen -> TransactionsScreen(screen = screen)
@@ -82,6 +89,7 @@ fun BoxWithConstraintsScope.ExparoNavGraph(screen: Screen?) {
         is LoanDetailsScreen -> LoanDetailsScreen(screen = screen)
         is SearchScreen -> SearchScreen(screen = screen)
         is CSVScreen -> CSVScreen(screen = screen)
+        is DriveBackupScreen -> BackupScreen(screen = screen)
         FeaturesScreen -> FeaturesScreenImpl()
         AttributionsScreen -> AttributionsScreenImpl()
         ContributorsScreen -> ContributorsScreenImpl()

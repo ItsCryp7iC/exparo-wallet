@@ -42,6 +42,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 import javax.inject.Inject
+import java.io.OutputStream
+
 
 // TODO: Legacy code, needs improvements
 class BackupDataUseCase @Inject constructor(
@@ -74,13 +76,11 @@ class BackupDataUseCase @Inject constructor(
     private val tagsWriter: WriteTagDao,
     private val tagAssociationWriter: WriteTagAssociationDao
 ) {
-    suspend fun exportToFile(
-        zipFileUri: Uri
-    ) {
+    suspend fun exportToStream(outputStream: OutputStream) {
         val jsonString = generateJsonBackup()
-        val file = createJsonDataFile(jsonString)
-        zip(context = context, zipFileUri, listOf(file))
-        clearCacheDir()
+        val tempJsonFile = createJsonDataFile(jsonString)
+        zip(outputStream, listOf(tempJsonFile)) // Assuming your zip function can write to a stream
+        tempJsonFile.delete()
     }
 
     private fun createJsonDataFile(jsonString: String): File {
@@ -317,11 +317,6 @@ class BackupDataUseCase @Inject constructor(
         }
     }
 
-    /** This is used to replace account & category Ids in backup data with existing Ids
-     *  This removes the problem of duplicate Accounts & Categories
-     *
-     *  returns a Pair<A,B> of IDs where A is the UUID that needs to be replaced with B
-     */
     private suspend fun getReplacementPairs(
         completeData: ExparoWalletCompleteData
     ): List<Pair<UUID, UUID>> {
